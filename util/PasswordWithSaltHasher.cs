@@ -14,14 +14,14 @@ namespace LoginComponent.util
         public HashAndSalt HashWithSalt(string password, string salt, HashAlgorithm hashAlgo)
         {
             RNG rng = new RNG();
-            byte[] saltBytes = Encoding.ASCII.GetBytes(salt);  
+            byte[] saltBytes = Encoding.UTF8.GetBytes(salt);
             byte[] passwordAsBytes = Encoding.UTF8.GetBytes(password);
             List<byte> passwordWithSaltBytes = new List<byte>();
             passwordWithSaltBytes.AddRange(passwordAsBytes);
             passwordWithSaltBytes.AddRange(saltBytes);
             byte[] digestBytes = hashAlgo.ComputeHash(passwordWithSaltBytes.ToArray());
             HashAndSalt hs = new();
-            hs.Salt = Convert.ToBase64String(saltBytes);
+            hs.Salt = Encoding.UTF8.GetString(saltBytes);
             hs.Hash = Convert.ToBase64String(digestBytes);
             return hs;
         }
@@ -29,16 +29,9 @@ namespace LoginComponent.util
         public HashAndSalt HashWithRandomSalt(string password, int saltLength, HashAlgorithm hashAlgo)
         {
             RNG rng = new RNG();
-            byte[] saltBytes = rng.GenerateRandomCryptographicBytes(saltLength);
-            byte[] passwordAsBytes = Encoding.UTF8.GetBytes(password);
-            List<byte> passwordWithSaltBytes = new List<byte>();
-            passwordWithSaltBytes.AddRange(passwordAsBytes);
-            passwordWithSaltBytes.AddRange(saltBytes);
-            byte[] digestBytes = hashAlgo.ComputeHash(passwordWithSaltBytes.ToArray());
-            HashAndSalt hs = new();
-            hs.Salt = Convert.ToBase64String(saltBytes);
-            hs.Hash = Convert.ToBase64String(digestBytes);
-            return hs;
+            string salt = rng.GenerateRandomCryptographicKey(saltLength);
+
+            return HashWithSalt(password, salt, hashAlgo);
         }
     }
 }

@@ -29,37 +29,60 @@ namespace LoginComponent
 
         public bool Login(string email, string password)
         {
+            var selectCmd = _connection.CreateCommand();
+            selectCmd.CommandText = "SELECT * FROM LoginCredentials WHERE email = @email AND hashedPassword = @hashedPassword";
+            selectCmd.Parameters.AddWithValue("@email", email);
+            selectCmd.Parameters.AddWithValue("@hashedPassword", password);
+
+            using (var reader = selectCmd.ExecuteReader())
+            {
+                if(!reader.Read())
+                    throw new KeyNotFoundException();
+            }
+
             return true;
         }
 
-        public bool CreateLogin(string email, string password)
+        public bool CreateLogin(string email, HashAndSalt hashAndSalt)
         {
-            var insertCmd = new SqliteCommand("INSERT INTO LoginCredentials(email, password) VALUES(@email, @password)");
+            var insertCmd = new SqliteCommand("INSERT INTO LoginCredentials(email, hashedPassword, salt) VALUES(@email, @hashedPassword, @salt)");
             insertCmd.Connection = _connection;
-
-            var pEmail = new SqliteParameter("email", email);
-            insertCmd.Parameters.Add(pEmail);
-            var pPassword = new SqliteParameter("password", password);
-            insertCmd.Parameters.Add(pPassword);
+            insertCmd.Parameters.AddWithValue("email", email);
+            insertCmd.Parameters.AddWithValue("hashedPassword", hashAndSalt.Hash);
+            insertCmd.Parameters.AddWithValue("salt", hashAndSalt.Salt);
             insertCmd.ExecuteNonQuery();
 
             return true;
         }
 
-        public bool UpdateLogin(string email, string newPassword, string oldPassword)
+        public bool UpdateLogin(string email, string password)
         {
-            var insertCmd = new SqliteCommand("UPDATE LoginCredentials SET password = @newPassword WHERE email = @email AND password = @oldPassword)");
+            var insertCmd = new SqliteCommand("UPDATE LoginCredentials SET hashedPassword = @newHashedPassword WHERE email = @email");
             insertCmd.Connection = _connection;
-
-            var pEmail = new SqliteParameter("email", email);
-            insertCmd.Parameters.Add(pEmail);
-            var pPassword = new SqliteParameter("password", newPassword);
-            insertCmd.Parameters.Add(pPassword);
+            insertCmd.Parameters.AddWithValue("email", email);
+            insertCmd.Parameters.AddWithValue("newHashedPassword", password);
             insertCmd.ExecuteNonQuery();
 
             return true;
         }
 
+        public string GetLoginPasswordSalt(string email)
+        {
+            var selectCmd = _connection.CreateCommand();
+            selectCmd.CommandText = "SELECT salt FROM LoginCredentials WHERE email = @email";
+            selectCmd.Parameters.AddWithValue("@email", email);
 
+            string salt;
+
+            using (var reader = selectCmd.ExecuteReader())
+            {                
+                if(!reader.Read())
+                    throw new KeyNotFoundException();
+
+                salt = reader.GetString(0);
+            }
+
+            return salt;
+        }
     }
 }

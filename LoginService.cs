@@ -16,48 +16,50 @@ namespace LoginComponent
 
         public bool Login(string email, string password)
         {
-            if(!validator.isEmailValid(email) || !validator.isPasswordValid(password))
-            {
-                throw new ArgumentNullException();
-            }
+            validator.isEmailValid(email);
+            validator.isPasswordValid(password);
 
-            return db.Login(email, password);;
+            string salt = db.GetLoginPasswordSalt(email);
+            string hashedPassword = ReHashing(password, salt);
+
+            return db.Login(email, hashedPassword);
         }
 
         public bool CreateLogin(string email, string password)
         {
-            if(!validator.isEmailValid(email) || !validator.isPasswordValid(password))
-            {
-                throw new ArgumentNullException();
-            }
+            validator.isEmailValid(email);
+            validator.isPasswordValid(password);
+            HashAndSalt hashAndSalt = Hashing(password);
 
-            return db.CreateLogin(email, password);
+            return db.CreateLogin(email, hashAndSalt);
         }
 
         public bool UpdateLogin(string email, string newPassword, string oldPassword)
         {
-            if(!validator.isEmailValid(email) || !validator.isPasswordValid(newPassword) || oldPassword != null)
-            {
-                throw new ArgumentNullException();
-            }
+            validator.isEmailValid(email);
+            validator.isPasswordValid(newPassword);
+            bool isLoginValid = Login(email, oldPassword);
+            HashAndSalt hashAndSalt = new HashAndSalt();
+            hashAndSalt.Salt = db.GetLoginPasswordSalt(email);
+            hashAndSalt.Hash = ReHashing(newPassword, hashAndSalt.Salt);
 
-            return db.UpdateLogin(email, newPassword, oldPassword);
+            return db.UpdateLogin(email, hashAndSalt.Hash);
         }
 
         public HashAndSalt Hashing(string password)
         {
             PasswordWithSaltHasher pwHasher = new PasswordWithSaltHasher();
-            HashAndSalt hashResultSha256 = pwHasher.HashWithRandomSalt(password, 64, SHA256.Create());
+            HashAndSalt hashAndSalt = pwHasher.HashWithRandomSalt(password, 64, SHA256.Create());
 
-            return hashResultSha256;
+            return hashAndSalt;
         }
 
         public string ReHashing(string password, string salt)
         {
             PasswordWithSaltHasher pwHasher = new PasswordWithSaltHasher();
-            HashAndSalt hashResultSha256 = pwHasher.HashWithSalt(password, salt, SHA256.Create());
+            HashAndSalt hashAndSalt = pwHasher.HashWithSalt(password, salt, SHA256.Create());
 
-            return hashResultSha256.Hash;
+            return hashAndSalt.Hash;
         }
     }
 }
