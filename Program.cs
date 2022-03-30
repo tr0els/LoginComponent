@@ -17,13 +17,10 @@ Console.WriteLine("Testing if rehash generates same password using same salt:");
 Console.WriteLine($"hash for password is: " + moreHash);
 */
 
+
 // Testing login functionality
 string createLoginStatus = ls.CreateLogin("hey@email.dk", "123abcABC") ? "Success!" : "Failed!";
 Console.WriteLine($"Testing create login --> {createLoginStatus}");
-
-string salt = db.GetLoginPasswordSalt("hey@email.dk");
-//Console.WriteLine($"Salt from db: " + salt);
-
 
 string loginStatus = ls.Login("hey@email.dk", "123abcABC") ? "Success!" : "Failed!";
 Console.WriteLine($"Testing login --> {loginStatus}");
