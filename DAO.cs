@@ -29,7 +29,7 @@ namespace LoginComponent
 
         public bool Login(string email, string password)
         {
-            if(!ValidateEmail(email) || !ValidatePassword(password))
+            if(!isEmailValid(email) || !isPasswordValid(password))
             {
                 throw new ArgumentNullException();
             }
@@ -39,7 +39,7 @@ namespace LoginComponent
 
         public bool CreateLogin(string email, string password)
         {
-            if(!ValidateEmail(email) || !ValidatePassword(password))
+            if(!isEmailValid(email) || !isPasswordValid(password))
             {
                 throw new ArgumentNullException();
             }
@@ -58,7 +58,7 @@ namespace LoginComponent
 
         public bool UpdateLogin(string email, string newPassword, string oldPassword)
         {
-            if(!ValidateEmail(email) || !ValidatePassword(newPassword) || oldPassword != null)
+            if(!isEmailValid(email) || !isPasswordValid(newPassword) || oldPassword != null)
             {
                 throw new ArgumentNullException();
             }
@@ -75,7 +75,7 @@ namespace LoginComponent
             return true;
         }
 
-        private bool ValidateEmail(string email)
+        private bool isEmailValid(string email)
         {
             if(email == null)
             {
@@ -87,7 +87,7 @@ namespace LoginComponent
             return true;
         }
 
-        private bool ValidatePassword(string password)
+        private bool isPasswordValid(string password)
         {
             if(password.Length < 8)
             {
