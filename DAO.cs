@@ -8,20 +8,16 @@ namespace LoginComponent
 {
     internal class DAO
     {
-        public void Create() { 
+        public bool Create(string email, string password) { 
             throw new NotImplementedException();
         }
 
-        public void Read() {
+        public bool Read(string email, string password) {
             throw new NotImplementedException();
         }
 
-        public void Update() {
+        public bool Update(string email, string newPassword, string oldPassword) {
             throw new NotImplementedException();
         }
-
-        public void Delete() {
-            throw new NotImplementedException();
-        } 
     }
 }
