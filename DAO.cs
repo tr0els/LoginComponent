@@ -66,7 +66,7 @@ namespace LoginComponent
                 return true;
             }
 
-            return true;
+            return false;
         }
 
         public string GetLoginPasswordSalt(string email)
