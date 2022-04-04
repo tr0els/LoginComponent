@@ -36,11 +36,8 @@ namespace LoginComponent
 
             using (var reader = selectCmd.ExecuteReader())
             {
-                if(!reader.Read())
-                    throw new KeyNotFoundException();
+                return reader.Read();
             }
-
-            return true;
         }
 
         public bool CreateLogin(string email, HashAndSalt hashAndSalt)
@@ -50,9 +47,12 @@ namespace LoginComponent
             insertCmd.Parameters.AddWithValue("email", email);
             insertCmd.Parameters.AddWithValue("hashedPassword", hashAndSalt.Hash);
             insertCmd.Parameters.AddWithValue("salt", hashAndSalt.Salt);
-            insertCmd.ExecuteNonQuery();
+            if (insertCmd.ExecuteNonQuery() > 0)
+            {
+                return true;
+            }
 
-            return true;
+            return false;
         }
 
         public bool UpdateLogin(string email, string password)
@@ -61,7 +61,10 @@ namespace LoginComponent
             insertCmd.Connection = _connection;
             insertCmd.Parameters.AddWithValue("email", email);
             insertCmd.Parameters.AddWithValue("newHashedPassword", password);
-            insertCmd.ExecuteNonQuery();
+            if (insertCmd.ExecuteNonQuery() > 0)
+            {
+                return true;
+            }
 
             return true;
         }

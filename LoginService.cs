@@ -16,8 +16,8 @@ namespace LoginComponent
 
         public bool Login(string email, string password)
         {
-            validator.isEmailValid(email);
-            validator.isPasswordValid(password);
+            validator.IsEmailValid(email);
+            validator.IsPasswordValid(password);
 
             string salt = db.GetLoginPasswordSalt(email);
             string hashedPassword = ReHashing(password, salt);
@@ -27,8 +27,8 @@ namespace LoginComponent
 
         public bool CreateLogin(string email, string password)
         {
-            validator.isEmailValid(email);
-            validator.isPasswordValid(password);
+            validator.IsEmailValid(email);
+            validator.IsPasswordValid(password);
             HashAndSalt hashAndSalt = Hashing(password);
 
             return db.CreateLogin(email, hashAndSalt);
@@ -36,8 +36,8 @@ namespace LoginComponent
 
         public bool UpdateLogin(string email, string newPassword, string oldPassword)
         {
-            validator.isEmailValid(email);
-            validator.isPasswordValid(newPassword);
+            validator.IsEmailValid(email);
+            validator.IsPasswordValid(newPassword);
             bool isLoginValid = Login(email, oldPassword);
             HashAndSalt hashAndSalt = new HashAndSalt();
             hashAndSalt.Salt = db.GetLoginPasswordSalt(email);

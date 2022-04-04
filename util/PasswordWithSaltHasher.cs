@@ -13,6 +13,11 @@ namespace LoginComponent.util
         
         public HashAndSalt HashWithSalt(string password, string salt, HashAlgorithm hashAlgo)
         {
+            if (password == null || salt == null)
+            {
+                throw new ArgumentNullException("Password and salt cannot be null");
+            }
+
             RNG rng = new RNG();
             byte[] saltBytes = Encoding.UTF8.GetBytes(salt);
             byte[] passwordAsBytes = Encoding.UTF8.GetBytes(password);
@@ -28,6 +33,11 @@ namespace LoginComponent.util
 
         public HashAndSalt HashWithRandomSalt(string password, int saltLength, HashAlgorithm hashAlgo)
         {
+            if (password == null)
+            {
+                throw new ArgumentNullException("Password cannot be null");
+            }
+
             RNG rng = new RNG();
             string salt = rng.GenerateRandomCryptographicKey(saltLength);
 
